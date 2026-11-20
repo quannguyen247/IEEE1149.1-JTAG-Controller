@@ -1,0 +1,56 @@
+entity JTAG_TOP is
+    generic (PHYSICAL_PIN_MAP : string := "SOFT_IP");
+
+    port (
+        TCK     : in     bit;
+        TMS     : in     bit;
+        TDI     : in     bit;
+        TDO     : out    bit;
+        TRST_N  : in     bit;
+        PIN_IN  : in     bit_vector(0 to 7);
+        PIN_OUT : buffer bit_vector(0 to 7)
+    );
+
+    use STD_1149_1_2001.all;
+    attribute COMPONENT_CONFORMANCE of JTAG_TOP : entity is "STD_1149_1_2001";
+    attribute PIN_MAP of JTAG_TOP : entity is PHYSICAL_PIN_MAP;
+
+    constant SOFT_IP : PIN_MAP_STRING :=
+        "TCK:P_TCK, TMS:P_TMS, TDI:P_TDI, TDO:P_TDO, TRST_N:P_TRST_N, " &
+        "PIN_IN:(I0, I1, I2, I3, I4, I5, I6, I7), " &
+        "PIN_OUT:(O0, O1, O2, O3, O4, O5, O6, O7)";
+
+    attribute TAP_SCAN_CLOCK of TCK    : signal is (100.0e6, BOTH);
+    attribute TAP_SCAN_IN    of TDI    : signal is true;
+    attribute TAP_SCAN_MODE  of TMS    : signal is true;
+    attribute TAP_SCAN_OUT   of TDO    : signal is true;
+    attribute TAP_SCAN_RESET of TRST_N : signal is true;
+
+    attribute INSTRUCTION_LENGTH of JTAG_TOP : entity is 4;
+    attribute INSTRUCTION_OPCODE of JTAG_TOP : entity is
+        "EXTEST  (0000), " &
+        "SAMPLE  (0001), " &
+        "PRELOAD (0001), " &
+        "BYPASS  (1111, 0010, 0011, 0100, 0101, 0110, 0111, " &
+        "         1000, 1001, 1010, 1011, 1100, 1101, 1110)";
+    attribute INSTRUCTION_CAPTURE of JTAG_TOP : entity is "0001";
+
+    attribute BOUNDARY_LENGTH of JTAG_TOP : entity is 16;
+    attribute BOUNDARY_REGISTER of JTAG_TOP : entity is
+        " 0 (BC_4, PIN_IN(0),  input,   X), " &
+        " 1 (BC_4, PIN_IN(1),  input,   X), " &
+        " 2 (BC_4, PIN_IN(2),  input,   X), " &
+        " 3 (BC_4, PIN_IN(3),  input,   X), " &
+        " 4 (BC_4, PIN_IN(4),  input,   X), " &
+        " 5 (BC_4, PIN_IN(5),  input,   X), " &
+        " 6 (BC_4, PIN_IN(6),  input,   X), " &
+        " 7 (BC_4, PIN_IN(7),  input,   X), " &
+        " 8 (BC_2, PIN_OUT(0), output2, X), " &
+        " 9 (BC_2, PIN_OUT(1), output2, X), " &
+        "10 (BC_2, PIN_OUT(2), output2, X), " &
+        "11 (BC_2, PIN_OUT(3), output2, X), " &
+        "12 (BC_2, PIN_OUT(4), output2, X), " &
+        "13 (BC_2, PIN_OUT(5), output2, X), " &
+        "14 (BC_2, PIN_OUT(6), output2, X), " &
+        "15 (BC_2, PIN_OUT(7), output2, X)";
+end JTAG_TOP;
